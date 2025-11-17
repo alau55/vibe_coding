@@ -30,12 +30,20 @@ const Navbar = () => {
               </Link>
 
               {user && (
-                <Link
-                  to="/my-reservations"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-blue-600"
-                >
-                  My Reservations
-                </Link>
+                <>
+                  <Link
+                    to="/my-reservations"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-blue-600"
+                  >
+                    My Reservations
+                  </Link>
+                  <Link
+                    to="/kb"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-blue-600"
+                  >
+                    Knowledge Base
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -83,12 +91,20 @@ const Navbar = () => {
             Properties
           </Link>
           {user && (
-            <Link
-              to="/my-reservations"
-              className="block pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600"
-            >
-              My Reservations
-            </Link>
+            <>
+              <Link
+                to="/my-reservations"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+              >
+                My Reservations
+              </Link>
+              <Link
+                to="/kb"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+              >
+                Knowledge Base
+              </Link>
+            </>
           )}
         </div>
       </div>

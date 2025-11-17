@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import PropertyDetail from './pages/PropertyDetail';
 import MyReservations from './pages/MyReservations';
+import KnowledgeBase from './pages/KnowledgeBase';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="/my-reservations" element={<MyReservations />} />
+            <Route path="/kb" element={<KnowledgeBase />} />
           </Routes>
 
           {/* Toast Notifications */}
