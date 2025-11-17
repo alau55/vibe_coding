@@ -1,0 +1,25 @@
+{
+  "name": "kb-cli",
+  "version": "1.0.0",
+  "description": "AI-powered knowledge base CLI with auto-tagging",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "kb": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "link": "npm link",
+    "unlink": "npm unlink -g kb-cli"
+  },
+  "keywords": ["cli", "knowledge-base", "tagging", "ai"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "commander": "^12.1.0",
+    "inquirer": "^10.2.2",
+    "chalk": "^5.3.0",
+    "ora": "^8.1.0"
+  }
+}
