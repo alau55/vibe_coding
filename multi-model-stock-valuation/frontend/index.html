@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Model Stock Valuation Tool</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">Multi-Model Stock Valuation Tool</h1>
+                <p class="app-subtitle">Compare multiple valuation models for comprehensive stock analysis</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Ticker Search Section -->
+            <section class="search-section card">
+                <h2 class="section-title">Step 1: Select Stock</h2>
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <input
+                            type="text"
+                            id="tickerInput"
+                            class="ticker-input"
+                            placeholder="Enter stock ticker (e.g., AAPL, MSFT)..."
+                            autocomplete="off"
+                        >
+                        <button id="searchBtn" class="btn btn-primary">
+                            <span class="btn-text">Search</span>
+                            <span class="btn-loader loader hidden"></span>
+                        </button>
+                    </div>
+                    <div id="tickerError" class="error-message hidden"></div>
+                </div>
+
+                <!-- Company Info Card -->
+                <div id="companyInfoCard" class="company-info-card hidden">
+                    <div class="company-header">
+                        <div>
+                            <h3 id="companyName" class="company-name"></h3>
+                            <p id="companySector" class="company-sector"></p>
+                        </div>
+                        <div class="company-price-info">
+                            <div class="current-price">
+                                <span class="label">Current Price</span>
+                                <span id="currentPrice" class="price-value"></span>
+                            </div>
+                            <div class="price-change">
+                                <span class="label">Today</span>
+                                <span id="priceChange" class="change-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Market Cap</span>
+                            <span id="marketCap" class="metric-value">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">P/E Ratio</span>
+                            <span id="peRatio" class="metric-value">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">P/B Ratio</span>
+                            <span id="pbRatio" class="metric-value">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Dividend Yield</span>
+                            <span id="dividendYield" class="metric-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Selection Section -->
+            <section id="modelSection" class="model-section card hidden">
+                <h2 class="section-title">Step 2: Select Valuation Model</h2>
+                <div class="model-selector-container">
+                    <label for="modelSelect" class="label">Choose a model:</label>
+                    <div class="select-wrapper">
+                        <select id="modelSelect" class="model-select">
+                            <option value="">Loading models...</option>
+                        </select>
+                        <span class="applicability-indicator" id="applicabilityIndicator" title="Model suitability for this stock"></span>
+                    </div>
+                    <div id="modelDescription" class="model-description hidden"></div>
+                </div>
+            </section>
+
+            <!-- Valuation Form Section -->
+            <section id="formSection" class="form-section card hidden">
+                <h2 class="section-title">Step 3: Configure Parameters</h2>
+                <form id="valuationForm" class="valuation-form">
+                    <div id="parametersContainer" class="parameters-container"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-calculate">
+                            <span class="btn-text">Calculate Valuation</span>
+                            <span class="btn-loader loader hidden"></span>
+                        </button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+                    <div id="formError" class="error-message hidden"></div>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section card hidden">
+                <h2 class="section-title">Valuation Results</h2>
+
+                <div class="results-container">
+                    <!-- Fair Value Card -->
+                    <div class="result-card fair-value-card">
+                        <h3 class="card-title">Fair Value Analysis</h3>
+                        <div class="fair-value-display">
+                            <div class="value-item">
+                                <span class="value-label">Fair Value</span>
+                                <span id="fairValue" class="value-amount">-</span>
+                            </div>
+                            <div class="value-item">
+                                <span class="value-label">Current Price</span>
+                                <span id="priceInResults" class="value-amount">-</span>
+                            </div>
+                            <div class="value-item">
+                                <span class="value-label">Upside/Downside</span>
+                                <span id="upsideDownside" class="value-amount highlight">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verdict Card -->
+                    <div class="result-card verdict-card">
+                        <h3 class="card-title">Verdict</h3>
+                        <div class="verdict-badge-container">
+                            <span id="verdictBadge" class="verdict-badge"></span>
+                            <div id="verdictDescription" class="verdict-description"></div>
+                        </div>
+                        <div class="confidence-container">
+                            <span class="confidence-label">Confidence Score</span>
+                            <div class="confidence-bar">
+                                <div id="confidenceBar" class="confidence-fill"></div>
+                            </div>
+                            <span id="confidencePercent" class="confidence-percent">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Assumptions -->
+                <div class="key-assumptions">
+                    <button id="assumptionsToggle" class="assumptions-toggle">
+                        <span class="toggle-icon">¼</span>
+                        Key Assumptions
+                    </button>
+                    <div id="assumptionsContent" class="assumptions-content hidden">
+                        <div id="assumptionsList" class="assumptions-list"></div>
+                    </div>
+                </div>
+
+                <!-- Sensitivity Analysis -->
+                <div class="sensitivity-section">
+                    <h3 class="card-title">Sensitivity Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="sensitivityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Compare All Models Button -->
+                <div class="compare-section">
+                    <button id="compareAllBtn" class="btn btn-secondary btn-compare">
+                        <span class="btn-text">Compare All Models</span>
+                        <span class="btn-loader loader hidden"></span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Comparison Results Section -->
+            <section id="comparisonSection" class="comparison-section card hidden">
+                <h2 class="section-title">All Models Comparison</h2>
+
+                <div class="comparison-summary">
+                    <div class="consensus-card">
+                        <h3 class="card-title">Consensus Analysis</h3>
+                        <div class="consensus-info">
+                            <div class="consensus-item">
+                                <span class="label">Average Fair Value</span>
+                                <span id="consensusFairValue" class="value">-</span>
+                            </div>
+                            <div class="consensus-item">
+                                <span class="label">Consensus Verdict</span>
+                                <span id="consensusVerdict" class="value">-</span>
+                            </div>
+                            <div class="consensus-item">
+                                <span class="label">Models Agreeing</span>
+                                <span id="modelsAgreeing" class="value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="table-wrapper">
+                    <table id="comparisonTable" class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Fair Value</th>
+                                <th>Upside/Downside</th>
+                                <th>Verdict</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <tr><td colspan="5" class="loading">Loading comparison data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Comparison Chart -->
+                <div class="chart-section">
+                    <h3 class="card-title">Fair Value Comparison</h3>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Multi-Model Stock Valuation Tool. Financial data provided by various sources. For informational purposes only.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/ticker-input.js"></script>
+    <script src="js/model-selector.js"></script>
+    <script src="js/valuation-form.js"></script>
+    <script src="js/results-display.js"></script>
+</body>
+</html>
