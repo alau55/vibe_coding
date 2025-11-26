@@ -1,5 +1,6 @@
 """
 Flask API for Multi-Model Stock Valuation Tool
+Version: 1.0.0 - Production Ready
 """
 from flask import Flask, request, jsonify
 from flask_cors import CORS
