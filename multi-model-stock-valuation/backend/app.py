@@ -12,7 +12,16 @@ import traceback
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+
+# CORS configuration - allows all origins in development, specific origins in production
+# For production, update this with your actual frontend URL
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["*"],  # Update with specific origins in production: ["https://your-frontend.onrender.com"]
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Load configuration
 config = get_config()
@@ -95,6 +104,16 @@ def index():
             '/api/valuation/compare-all': 'POST - Compare all models'
         }
     })
+
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for monitoring"""
+    return jsonify({
+        'status': 'healthy',
+        'service': 'stock-valuation-api',
+        'version': '1.0.0'
+    }), 200
 
 
 @app.route('/api/ticker/search', methods=['POST'])
