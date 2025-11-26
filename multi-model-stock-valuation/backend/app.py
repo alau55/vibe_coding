@@ -108,6 +108,26 @@ def index():
     })
 
 
+@app.route('/api')
+@app.route('/api/')
+def api_index():
+    """API base endpoint - same as root"""
+    return jsonify({
+        'name': 'Multi-Model Stock Valuation API',
+        'version': '1.0.0',
+        'status': 'active',
+        'endpoints': {
+            '/api/ticker/search': 'POST - Search for ticker symbols',
+            '/api/stock/fetch': 'POST - Fetch comprehensive stock data',
+            '/api/models/list': 'GET - List all available models',
+            '/api/models/check-applicability': 'POST - Check if model is suitable',
+            '/api/models/get-inputs': 'POST - Get model input parameters',
+            '/api/valuation/calculate': 'POST - Calculate valuation',
+            '/api/valuation/compare-all': 'POST - Compare all models'
+        }
+    })
+
+
 @app.route('/health')
 def health_check():
     """Health check endpoint for monitoring"""
