@@ -31,4 +31,3 @@ services:
       - path: /*
         name: Cache-Control
         value: public, max-age=3600
-    plan: free
