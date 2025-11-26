@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Valuation - DCF Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📊 Stock Valuation Tool</h1>
+            <p>Discounted Cash Flow (DCF) Analysis</p>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <input
+                    type="text"
+                    id="tickerInput"
+                    placeholder="Enter stock ticker (e.g., AAPL, MSFT, GOOGL)"
+                    autocomplete="off"
+                >
+                <button id="searchBtn">Analyze</button>
+            </div>
+            <div id="searchError" class="error-message"></div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Fetching stock data...</p>
+        </div>
+
+        <!-- Company Info Section -->
+        <section id="companyInfo" class="company-info hidden">
+            <h2 id="companyName"></h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Ticker:</span>
+                    <span id="ticker" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Current Price:</span>
+                    <span id="currentPrice" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Market Cap:</span>
+                    <span id="marketCap" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Sector:</span>
+                    <span id="sector" class="value"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Historical Metrics Section -->
+        <section id="historicalMetrics" class="metrics-section hidden">
+            <h3>Historical Performance</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Revenue CAGR</div>
+                    <div id="revenueCagr" class="metric-value"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">FCF CAGR</div>
+                    <div id="fcfCagr" class="metric-value"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg FCF Margin</div>
+                    <div id="avgFcfMargin" class="metric-value"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Latest FCF</div>
+                    <div id="latestFcf" class="metric-value"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DCF Calculator Section -->
+        <section id="dcfCalculator" class="calculator-section hidden">
+            <h3>DCF Parameters</h3>
+            <div class="parameters-grid">
+                <div class="parameter-group">
+                    <label for="growthRate">Growth Rate (%):</label>
+                    <input type="number" id="growthRate" step="0.5" value="5.0">
+                    <small>Expected annual FCF growth rate</small>
+                </div>
+                <div class="parameter-group">
+                    <label for="discountRate">Discount Rate (WACC) (%):</label>
+                    <input type="number" id="discountRate" step="0.5" value="10.0">
+                    <small>Weighted Average Cost of Capital</small>
+                </div>
+                <div class="parameter-group">
+                    <label for="terminalGrowth">Terminal Growth Rate (%):</label>
+                    <input type="number" id="terminalGrowth" step="0.1" value="2.5">
+                    <small>Perpetual growth rate</small>
+                </div>
+                <div class="parameter-group">
+                    <label for="projectionYears">Projection Years:</label>
+                    <input type="number" id="projectionYears" min="3" max="10" value="5">
+                    <small>Number of years to project</small>
+                </div>
+            </div>
+            <button id="calculateBtn" class="calculate-btn">Calculate Valuation</button>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results" class="results-section hidden">
+            <h3>Valuation Results</h3>
+
+            <!-- Fair Value Comparison -->
+            <div class="valuation-comparison">
+                <div class="comparison-item">
+                    <div class="comparison-label">Current Price</div>
+                    <div id="resultCurrentPrice" class="comparison-value current-price"></div>
+                </div>
+                <div class="comparison-divider">vs</div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Fair Value</div>
+                    <div id="fairValue" class="comparison-value fair-value"></div>
+                </div>
+            </div>
+            <div id="upsideDownside" class="upside-downside"></div>
+
+            <!-- Valuation Breakdown -->
+            <div class="breakdown-section">
+                <h4>Valuation Breakdown</h4>
+                <div class="breakdown-grid">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">PV of Cash Flows:</span>
+                        <span id="pvCashFlows" class="breakdown-value"></span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">PV of Terminal Value:</span>
+                        <span id="pvTerminalValue" class="breakdown-value"></span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Enterprise Value:</span>
+                        <span id="enterpriseValue" class="breakdown-value"></span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Equity Value:</span>
+                        <span id="equityValue" class="breakdown-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h4>Projected Free Cash Flows</h4>
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h4>Value Composition</h4>
+                    <canvas id="valueBreakdownChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sensitivity Analysis -->
+            <div class="sensitivity-section">
+                <h4>Sensitivity Analysis</h4>
+                <div id="sensitivityTable" class="sensitivity-table"></div>
+            </div>
+
+            <!-- Save Analysis Button -->
+            <div class="action-buttons">
+                <button id="saveBtn" class="save-btn">Save Analysis</button>
+                <button id="exportBtn" class="export-btn">Export to PDF</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
