@@ -13,13 +13,15 @@ import traceback
 # Initialize Flask app
 app = Flask(__name__)
 
-# CORS configuration - allows all origins in development, specific origins in production
-# For production, update this with your actual frontend URL
+# CORS configuration - Allow all origins for now (suitable for free tier/demo)
+# This allows the frontend to communicate with the backend from any domain
 CORS(app, resources={
-    r"/api/*": {
-        "origins": ["*"],  # Update with specific origins in production: ["https://your-frontend.onrender.com"]
+    r"/*": {
+        "origins": ["*"],
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Type"],
+        "supports_credentials": False
     }
 })
 
