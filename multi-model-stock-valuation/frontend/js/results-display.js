@@ -5,7 +5,12 @@
 
 class ResultsDisplay {
     constructor() {
-        this.API_BASE_URL = 'http://localhost:5000/api';
+        // Automatically detect environment and use appropriate API URL
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        this.API_BASE_URL = isLocalhost
+            ? 'http://localhost:5000/api'
+            : 'https://stock-valuation-api.onrender.com/api';
+
         this.resultsSection = document.getElementById('resultsSection');
         this.comparisonSection = document.getElementById('comparisonSection');
         this.compareAllBtn = document.getElementById('compareAllBtn');

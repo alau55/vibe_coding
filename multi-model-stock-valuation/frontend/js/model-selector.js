@@ -5,7 +5,12 @@
 
 class ModelSelector {
     constructor() {
-        this.API_BASE_URL = 'http://localhost:5000/api';
+        // Automatically detect environment and use appropriate API URL
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        this.API_BASE_URL = isLocalhost
+            ? 'http://localhost:5000/api'
+            : 'https://stock-valuation-api.onrender.com/api';
+
         this.modelSelect = document.getElementById('modelSelect');
         this.modelDescription = document.getElementById('modelDescription');
         this.applicabilityIndicator = document.getElementById('applicabilityIndicator');
@@ -225,7 +230,7 @@ class ModelSelector {
             title = 'Well-suited for this stock';
             className = 'suitable';
         } else if (applicability.confidence >= 0.5) {
-            icon = ' ';
+            icon = 'ï¿½';
             title = 'Moderately suited for this stock';
             className = 'warning';
         } else {
