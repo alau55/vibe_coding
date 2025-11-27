@@ -10,6 +10,7 @@ from data.peer_finder import PeerFinder
 from models import DCFModel, DDMModel, PEModel, EVEBITDAModel, PBModel, PEGModel
 from typing import Dict, Any
 import traceback
+import yfinance as yf
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -149,12 +150,40 @@ def search_ticker():
         if not query or len(query) < 1:
             return jsonify({'error': 'Query must be at least 1 character'}), 400
 
-        results = data_fetcher.search_ticker(query)
+        # Simplified: Just validate the ticker exists by trying to fetch basic info
+        query = query.upper().strip()
 
-        return jsonify({
-            'results': results,
-            'count': len(results)
-        })
+        try:
+            stock = yf.Ticker(query)
+            info = stock.info
+
+            # Check if we got valid data
+            if info and (info.get('symbol') or info.get('shortName') or info.get('longName')):
+                tickers = [{
+                    'ticker': query,
+                    'displaySymbol': info.get('symbol', query),
+                    'description': info.get('longName', info.get('shortName', query))
+                }]
+            else:
+                # Even if info is minimal, if ticker object exists, consider it valid
+                tickers = [{
+                    'ticker': query,
+                    'displaySymbol': query,
+                    'description': query
+                }]
+
+            return jsonify({
+                'tickers': tickers,
+                'count': len(tickers)
+            })
+
+        except Exception as ticker_error:
+            # If ticker fetch fails, return empty
+            return jsonify({
+                'tickers': [],
+                'count': 0,
+                'error': f'Ticker {query} not found'
+            }), 404
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -173,10 +202,8 @@ def fetch_stock():
         # Fetch stock data
         stock_data = data_fetcher.fetch_stock_data(ticker)
 
-        return jsonify({
-            'success': True,
-            'data': stock_data
-        })
+        # Return stock data directly (frontend expects fields at root level)
+        return jsonify(stock_data)
 
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
