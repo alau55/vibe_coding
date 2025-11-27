@@ -78,31 +78,24 @@ class TickerInput {
         this.hideError();
 
         try {
-            // Search for ticker
-            const searchResponse = await fetch(`${this.API_BASE_URL}/ticker/search`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: ticker })
-            });
+            // Skip search, fetch stock data directly with timeout
+            console.log(`Fetching data for ${ticker}...`);
 
-            if (!searchResponse.ok) {
-                throw new Error('Ticker not found');
-            }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
-            const searchData = await searchResponse.json();
-            if (!searchData.tickers || searchData.tickers.length === 0) {
-                throw new Error('Ticker not found. Please check the symbol.');
-            }
-
-            // Fetch stock data
             const fetchResponse = await fetch(`${this.API_BASE_URL}/stock/fetch`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ticker })
+                body: JSON.stringify({ ticker }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             if (!fetchResponse.ok) {
-                throw new Error('Failed to fetch stock data');
+                const errorData = await fetchResponse.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to fetch stock data');
             }
 
             const stockData = await fetchResponse.json();
@@ -111,14 +104,22 @@ class TickerInput {
             this.stockData = stockData;
 
             // Display company info
-            this.displayCompanyInfo(searchData.tickers[0], stockData);
+            const tickerInfo = {
+                displaySymbol: ticker,
+                description: stockData.company_info?.name || ticker
+            };
+            this.displayCompanyInfo(tickerInfo, stockData);
 
             // Emit custom event
             this.emitTickerSelected();
 
         } catch (error) {
-            console.error('Error searching ticker:', error);
-            this.showError(error.message || 'Failed to search ticker');
+            console.error('Error fetching ticker:', error);
+            if (error.name === 'AbortError') {
+                this.showError('Request timed out. The backend may be starting up (wait 60s and try again)');
+            } else {
+                this.showError(error.message || 'Failed to fetch stock data. Please try again.');
+            }
         } finally {
             this.setLoadingState(false);
         }
